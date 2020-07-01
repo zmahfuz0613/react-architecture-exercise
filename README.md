@@ -21,14 +21,13 @@ Your task is to use [Whimsical](https://whimsical.com) to create a beautiful dia
 Some thoughts to contemplate as you create your react diagram:
 
 What is the component hierarchy in this app?
-- For example, the App component calls which components? And those components call what components? 
-> This should be clear in the diagram.
+- For example, the App component calls which components? And those components call what components? This should be clear in the diagram.
 
 How do I differentiate a "screen" component vs a component in the components folder? Different color perhaps?
 
-How am I diagraming the Layout component since it uses `props.children`?
+How am I diagramming the Layout component since it uses `props.children`?
 
-How am I diagraming the services in this app? Is it clear which component uses which service?
+How am I diagramming the services in this app? Is it clear which component uses which service?
 - For example, the Products component uses the `getProducts()` service
 
 When done:
