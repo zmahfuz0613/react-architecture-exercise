@@ -30,7 +30,7 @@ How am I diagramming the Layout component since it uses `props.children`?
 How am I diagramming the services in this app? Is it clear which component uses which service?
 - For example, the Products component uses the `getProducts()` service
 
-When done:
+**When done:**
 
 1. Create a Pull Request
 2. Include your Whimsical diagram shareable link in the pull request description
