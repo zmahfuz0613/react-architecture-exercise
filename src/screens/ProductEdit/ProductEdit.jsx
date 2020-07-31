@@ -1,106 +1,98 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import './ProductEdit.css'
-import { Redirect } from 'react-router-dom'
+import { useParams, Redirect } from 'react-router-dom'
 import Layout from '../../components/shared/Layout/Layout'
 import { getProduct, updateProduct } from '../../services/products'
 
-class ProductEdit extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            product: {
-                name: '',
-                description: '',
-                imgURL: '',
-                price: ''
-            },
-            updated: false
+const ProductEdit = (props) => {
+
+    const [product, setProduct] = useState({
+            name: '',
+            description: '',
+            imgURL: '',
+            price: ''
+    })
+
+    const [isUpdated, setUpdated] = useState(false)
+    let { id } = useParams()
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            const product = await getProduct(id)
+            setProduct(product)
         }
-    }
-
-    async componentDidMount() {
-        let { id } = this.props.match.params
-        const product = await getProduct(id)
-        this.setState({ product })
-    }
+        fetchProduct()
+    }, [id])
 
 
-    handleChange = (event) => {
+    const handleChange = (event) => {
         const { name, value } = event.target
-        this.setState({
-            product: {
-                ...this.state.product,
+        setProduct({
+                ...product,
                 [name]: value
-            }
         })
     }
 
-    handleSubmit = async (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
-        let { id } = this.props.match.params
-        const updated = await updateProduct(id, this.state.product)
-        this.setState({ updated })
+        let { id } = props.match.params
+        const updated = await updateProduct(id, product)
+        setUpdated(updated)
     }
 
-    render() {
+    if (isUpdated) {
+        return <Redirect to={`/products/${props.match.params.id}`} />
+    }
 
-        const { product, updated } = this.state
-
-        if (updated) {
-            return <Redirect to={`/products/${this.props.match.params.id}`} />
-        }
-
-        return (
-            <Layout>
-                <div className="product-edit">
-                    <div className="image-container">
-                        <img className="edit-product-image" src={product.imgURL} alt={product.name} />
-                        <form onSubmit={this.handleSubmit}>
-                            <input
-                                className="edit-input-image-link"
-                                placeholder='Image Link'
-                                value={product.imgURL}
-                                name='imgURL'
-                                required
-                                onChange={this.handleChange}
-                            />
-                        </form>
-                    </div>
-                    <form className="edit-form" onSubmit={this.handleSubmit}>
+    return (
+        <Layout user={props.user}>
+            <div className="product-edit">
+                <div className="image-container">
+                    <img className="edit-product-image" src={product.imgURL} alt={product.name} />
+                    <form onSubmit={handleSubmit}>
                         <input
-                            className="input-name"
-                            placeholder='Name'
-                            value={product.name}
-                            name='name'
+                            className="edit-input-image-link"
+                            placeholder='Image Link'
+                            value={product.imgURL}
+                            name='imgURL'
                             required
-                            autoFocus
-                            onChange={this.handleChange}
+                            onChange={handleChange}
                         />
-                        <input
-                            className="input-price"
-                            placeholder='Price'
-                            value={product.price}
-                            name='price'
-                            required
-                            autoFocus
-                            onChange={this.handleChange}
-                        />
-                        <textarea
-                            className="textarea-description"
-                            rows={10}
-                            cols={78}
-                            placeholder='Description'
-                            value={product.description}
-                            name='description'
-                            required
-                            onChange={this.handleChange}
-                        />
-                        <button type='submit' className="save-button">Save</button>
                     </form>
                 </div>
-            </Layout>
-        )
-    }
+                <form className="edit-form" onSubmit={handleSubmit}>
+                    <input
+                        className="input-name"
+                        placeholder='Name'
+                        value={product.name}
+                        name='name'
+                        required
+                        autoFocus
+                        onChange={handleChange}
+                    />
+                    <input
+                        className="input-price"
+                        placeholder='Price'
+                        value={product.price}
+                        name='price'
+                        required
+                        onChange={handleChange}
+                    />
+                    <textarea
+                        className="textarea-description"
+                        rows={10}
+                        cols={78}
+                        placeholder='Description'
+                        value={product.description}
+                        name='description'
+                        required
+                        onChange={handleChange}
+                    />
+                    <button type='submit' className="save-button">Save</button>
+                </form>
+            </div>
+        </Layout>
+    )
 }
 
 export default ProductEdit

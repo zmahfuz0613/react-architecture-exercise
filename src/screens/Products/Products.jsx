@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import './Products.css'
 
 import Product from '../../components/Product/Product'
@@ -8,76 +8,61 @@ import Sort from '../../components/Sort/Sort'
 import Layout from '../../components/shared/Layout/Layout'
 import { getProducts } from '../../services/products'
 
-class Products extends Component {
-  constructor() {
-    super()
-    this.state = {
-      allProducts: [],
-      queriedProducts: [],
-      sortType: ''
+const Products = (props) => {
+  const [allProducts, setAllProducts] = useState([])
+  const [queriedProducts, setQueriedProducts] = useState([])
+  const [sortType, setSortType] = useState([])
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const products = await getProducts()
+      setAllProducts(products)
+      setQueriedProducts(products)
     }
-  }
+    fetchProducts()
+  }, [])
 
-  async componentDidMount() {
-    const allProducts = await getProducts()
-    this.setState({ 
-      allProducts: allProducts,
-      queriedProducts: allProducts 
-    })
-  }
-
-  handleSearch = event => {
-    const sort = () => this.handleSort(this.state.sortType)
-    const queriedProducts = this.state.allProducts.filter(product => product.name.toLowerCase().includes(event.target.value.toLowerCase()))
-    this.setState({ queriedProducts }, sort)
-  }
-
-  handleSort = type => {
-    this.setState({ sortType: type })
-    const { queriedProducts } = this.state
+  const handleSort = type => {
+    setSortType(type)
     switch (type) {
       case "name-ascending":
-        this.setState({
-          queriedProducts: AZ(queriedProducts)
-        });
+        setQueriedProducts(AZ(queriedProducts))
         break
       case "name-descending":
-        this.setState({
-          queriedProducts: ZA(queriedProducts)
-        });
+        setQueriedProducts(ZA(queriedProducts))
         break
       case "price-ascending":
-        this.setState({
-          queriedProducts: lowestFirst(queriedProducts)
-        });
+        setQueriedProducts(lowestFirst(queriedProducts))
         break
       case "price-descending":
-        this.setState({
-          queriedProducts: highestFirst(queriedProducts)
-        });
+        setQueriedProducts(highestFirst(queriedProducts))
         break
       default:
         break
     }
   }
 
-  handleSubmit = event => event.preventDefault()
-
-  render() {
-    const productsJSX = this.state.queriedProducts.map((product, index) =>
-      <Product _id={product._id} name={product.name} imgURL={product.imgURL} price={product.price} key={index} />
-    )
-
-    return (
-      <Layout>
-        <Search onSubmit={this.handleSubmit} onChange={this.handleSearch} />
-        <Sort onSubmit={this.handleSubmit} onChange={this.handleSort} />
-        <div className="products">
-          {productsJSX}
-        </div>
-      </Layout>
-    )
+  const handleSearch = event => {
+    const newQueriedProducts = allProducts.filter(product => product.name.toLowerCase().includes(event.target.value.toLowerCase()))
+    setQueriedProducts(newQueriedProducts, () => handleSort(sortType))
   }
+
+  const handleSubmit = event => event.preventDefault()
+
+  const productsJSX = queriedProducts.map((product, index) =>
+    <Product _id={product._id} name={product.name} imgURL={product.imgURL} price={product.price} key={index} />
+  )
+
+  return (
+    <Layout>
+      <Search onSubmit={handleSubmit} onChange={handleSearch} />
+      <Sort onSubmit={handleSubmit} onChange={handleSort} />
+      <div className="products">
+        {productsJSX}
+      </div>
+    </Layout>
+  )
 }
+
 
 export default Products

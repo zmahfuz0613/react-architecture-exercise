@@ -1,89 +1,78 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import './ProductCreate.css'
 import Layout from '../../components/shared/Layout/Layout'
 import { Redirect } from 'react-router-dom'
 import { createProduct } from '../../services/products'
 
-class ProductCreate extends Component {
-    constructor() {
-        super()
-        this.state = {
-            product: {
-                name: '',
-                description: '',
-                imgURL: '',
-                price: ''
-            },
-            created: false
-        }
-    }
+const ProductCreate = (props) => {
 
-    handleChange = (event) => {
+    const [product, setProduct] = useState({
+            name: '',
+            description: '',
+            imgURL: '',
+            price: ''
+        })
+
+    const [isCreated, setCreated] = useState(false)
+
+    const handleChange = (event) => {
         const { name, value } = event.target
-        this.setState({
-            product: {
-                ...this.state.product,
+        setProduct({
+                ...product,
                 [name]: value
-            }
         })
     }
 
-    handleSubmit = async (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
-        const created = await createProduct(this.state.product)
-        this.setState({ created })
+        const created = await createProduct(product)
+        setCreated({ created })
     }
 
-    render() {
-
-        const { product, created } = this.state
-
-        if (created) {
-            return <Redirect to={`/products`} />
-        }
-
-        return (
-            <Layout>
-                <form className="create-form" onSubmit={this.handleSubmit}>
-                    <input
-                        className="input-name"
-                        placeholder='Name'
-                        value={product.name}
-                        name='name'
-                        required
-                        autoFocus
-                        onChange={this.handleChange}
-                    />
-                    <input
-                        className="input-price"
-                        placeholder='Price'
-                        value={product.price}
-                        name='price'
-                        required
-                        onChange={this.handleChange}
-                    />
-                    <textarea
-                        className="textarea-description"
-                        rows={10}
-                        placeholder='Description'
-                        value={product.description}
-                        name='description'
-                        required
-                        onChange={this.handleChange}
-                    />
-                    <input
-                        className="input-image-link"
-                        placeholder='Image Link'
-                        value={product.imgURL}
-                        name='imgURL'
-                        required
-                        onChange={this.handleChange}
-                    />
-                    <button type='submit' className="submit-button">Submit</button>
-                </form>
-            </Layout>
-        )
+    if (isCreated) {
+        return <Redirect to={`/products`} />
     }
+    return (
+        <Layout user={props.user}>
+            <form className="create-form" onSubmit={handleSubmit}>
+                <input
+                    className="input-name"
+                    placeholder='Name'
+                    value={product.name}
+                    name='name'
+                    required
+                    autoFocus
+                    onChange={handleChange}
+                />
+                <input
+                    className="input-price"
+                    placeholder='Price'
+                    value={product.price}
+                    name='price'
+                    required
+                    onChange={handleChange}
+                />
+                <textarea
+                    className="textarea-description"
+                    rows={10}
+                    placeholder='Description'
+                    value={product.description}
+                    name='description'
+                    required
+                    onChange={handleChange}
+                />
+                <input
+                    className="input-image-link"
+                    placeholder='Image Link'
+                    value={product.imgURL}
+                    name='imgURL'
+                    required
+                    onChange={handleChange}
+                />
+                <button type='submit' className="submit-button">Submit</button>
+            </form>
+        </Layout>
+    )
 }
 
 export default ProductCreate
